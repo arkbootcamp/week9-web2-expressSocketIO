@@ -11,12 +11,27 @@ io.on('connection', socket => {
 console.log('client connect')
 
     socket.on('welcomeMessage', user =>{
-        console.log(user)
+        // console.log(user.room)
+        // user.room.map(room=>{
+        //     socket.join(room)
+        // })
+        
+        // private message
+        // socket.join('user:'+user.id)
+      
+        // group
+        socket.join(user.room)
         socket.emit('message', 'both : Selamat menggunakan aplikasi chat '+ user.username)
-        socket.broadcast.emit('notif', 'both: user join... ' + user.username)
+        socket.broadcast.to(user.room).emit('notif', 'both: user join... ' + user.username)
     })
-    socket.on('sendMessage', message =>{
-        io.emit('message', message)
+
+    socket.on('sendMessage', (data, callback) =>{
+        const error = true;
+        if(error){
+            callback('server down')
+        }
+        const time = new Date()
+        io.to(data.room).emit('message', data.message)
     })
     
     socket.on('disconnect', () => {
